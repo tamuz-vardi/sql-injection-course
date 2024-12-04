@@ -1,0 +1,7 @@
+FROM mysql
+MAINTAINER me
+
+ENV MYSQL_DATABASE=sqli_training \
+    MYSQL_ROOT_PASSWORD=root
+
+ADD schema.sql /docker-entrypoint-initdb.d
