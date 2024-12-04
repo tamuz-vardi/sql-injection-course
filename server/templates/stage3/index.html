@@ -1,0 +1,28 @@
+<html><body>
+
+
+<div class="container">
+<h1 for="username"><b>Hello {{session['name']}}!</b></h1>
+{% if session['is_admin'] == 1 %}
+<a href="admin">Admin Page</a><br>
+{% else %}
+<a>Haha LOSER, try logging in as admin</a><br>
+{% endif %}
+<button type="logout" id="logout">Logout<br>
+
+</div>
+
+<script>
+    function logout()
+    {
+        fetch("logout", {
+            method: 'GET'
+        }).then(response => {
+            window.location.href = response.url;
+        })
+    }
+    document.getElementById("logout").addEventListener("click", logout, false);
+</script>
+    
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+</body></html>

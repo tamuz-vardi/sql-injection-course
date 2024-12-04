@@ -1,0 +1,44 @@
+<html><body>
+
+
+<div class="container">
+<label for="username"><b>Username</b></label>
+<input type="text" placeholder="Enter Username" id="username" required><br>
+
+<label for="password"><b>Password</b></label>
+<input type="password" placeholder="Enter Password" id="password" required><br>
+
+<a id="Result"></a><br>
+
+<button type="submit" id="login">Login</button>
+</div>
+
+<script>
+    function login()
+    {
+        let username = document.getElementById("username").value;
+        let password = document.getElementById("password").value;
+        let data = {'username': username, 'password': password};
+        fetch("/stage3/login",{
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data),
+        }).then(response => {
+            if (response.redirected){
+                window.location.href = response.url;
+            }
+            else {
+                response.text().then(text => {
+                    document.getElementById("Result").text = text;
+                })
+            }
+        });
+    }
+    document.getElementById("login").addEventListener("click", login, false);
+</script>
+    
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+</body></html>

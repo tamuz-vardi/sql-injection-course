@@ -1,9 +1,16 @@
-from flask import Flask, render_template, redirect, request, session, url_for
+import argparse
+from flask import Flask, render_template, redirect, request, session
 from flask_session import Session
 import logging
 
-from .consts import SERVER_PORT, SERVER_HOST
-from .utils import create_cursor
+from .consts import DEFAULT_PORT, DEFAULT_HOST, PROJECT_ROOT
+from .utils.mysql import create_cursor
+from .utils.general import get_file_contents
+
+from .blueprints.management import management_bp
+from .blueprints.stage1 import stage1_bp
+from .blueprints.stage2 import stage2_bp
+from .blueprints.stage3 import stage3_bp
 
 # Disable flask logging
 log = logging.getLogger('werkzeug')
@@ -11,39 +18,28 @@ log.setLevel(logging.DEBUG)
 
 app = Flask(__name__)
 
-@app.route('/')
-def hello():
-    return '<h>Add stage number in url (e.g. /1)'
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_TYPE"] = "filesystem"
+Session(app)
 
-@app.route('/1', methods=["GET"])
-def stage1():
-    return render_template(f"stage1.html")
+app.register_blueprint(management_bp)
+app.register_blueprint(stage1_bp, url_prefix="/stage1")
+app.register_blueprint(stage2_bp, url_prefix="/stage2")
+app.register_blueprint(stage3_bp, url_prefix="/stage3")
 
-@app.route('/stage1', methods=["POST"])
-def stage1_internal():
-    logged_in_user = None
-    try:
-        command_format = "SELECT username FROM users1 WHERE username='{username}' AND password='{password}';"
-        command = command_format.format(username=request.json['username'], password=request.json['password'])
-        with create_cursor() as cursor:
-            cursor.execute(command)
-            row = cursor.fetchone()
-            logged_in_user = row[0]
-        
-    except (IndexError, TypeError):
-        pass
-    
-    if logged_in_user is None:
-        return "Failed"
-    return redirect(url_for("stage1_completed"))
-    
-@app.route("/stage1_completed")
-def stage1_completed():
-    return render_template("stage1_completed.html")
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--host", dest="host", default=DEFAULT_HOST, type=str)
+    parser.add_argument("--port", dest="port", default=DEFAULT_PORT, type=int)
+
+    return parser.parse_args()
 
 
 def main():
-    app.run(host=SERVER_HOST, port=SERVER_PORT)
+    args = parse_args()
+    app.run(host=args.host, port=args.port, debug=True)
+
 
 if "__main__" == __name__:
     main()
