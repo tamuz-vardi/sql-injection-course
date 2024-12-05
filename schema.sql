@@ -13,7 +13,7 @@ INSERT INTO `users1` (`username`, `password`, `is_admin`) VALUES
 ('admin', 'TopSecretClassified', 1);
 
 DROP TABLE IF EXISTS `harry_users`;
-CREATE TABLE `users1` (
+CREATE TABLE `harry_users` (
     `user_id` int(11) NOT NULL AUTO_INCREMENT,
     `username` varchar(255) DEFAULT NULL, 
     `password` varchar(50) DEFAULT NULL,
@@ -26,15 +26,15 @@ INSERT INTO `harry_users` (`username`, `password`) VALUES
 ('Voldemort', '4V4D4 K4D4VR4');
 
 DROP TABLE IF EXISTS `harry_products`;
-CREATE TABLE `users1` (
+CREATE TABLE `harry_products` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `name` varchar(255) DEFAULT NULL,
     `description` varchar(255) DEFAULT NULL, 
     `price` int(11) NOT NULL,
-    `amount in stock` int(11) NOT NULL,
+    `amount_in_stock` int(11) NOT NULL,
     PRIMARY KEY (`id`)
     ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=10001 ;
-INSERT INTO `harry_products` (`name`, `description`, `price`, `amount in stock`) VALUES 
+INSERT INTO `harry_products` (`name`, `description`, `price`, `amount_in_stock`) VALUES 
 ('Nimbus 2000', 'The fastest broom out there!', 100, 5),
 ('phoenix-feather Wand', 'You never choose a ward, the wand chooses you', 20, 1),
 ('Flying Car', 'The only existing one', 1000, 1),

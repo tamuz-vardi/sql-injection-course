@@ -12,11 +12,24 @@ stage4_bp = Blueprint("stage4", __name__)
 
 USERS_TABLE = 'harry_users'
 PRODUCTS_TABLE = 'harry_products'
+BAD_GUY_USERNAME = 'Voldemort'
+
+def does_voldemort_exist():
+    command = f"select * from {USERS_TABLE} where username='{BAD_GUY_USERNAME}'"
+    with create_cursor() as cursor:
+        cursor.execute(command)
+        if cursor.fetchone() is None:
+            return False
+    return True
 
 @stage4_bp.route('/', methods=["GET"])
 def login_page():
     if 'name' in session.keys():
         return redirect('index')
+
+    if not does_voldemort_exist():
+        return redirect('completion')
+    
     return render_template(f"stage4/login.html")
 
 @stage4_bp.route('/login', methods=["POST"])
@@ -25,7 +38,7 @@ def login():
         return redirect('index')
 
     try:
-        command_format = f"SELECT username FROM {USERS_TABLE} WHERE username=%(username)s AND password=%(password)s;"
+        command = f"SELECT username FROM {USERS_TABLE} WHERE username=%(username)s AND password=%(password)s;"
         with create_cursor() as cursor:
             cursor.execute(command, {'password': request.json['password'], 'username': request.json['username']})
             row = cursor.fetchone()
@@ -45,13 +58,13 @@ def register():
 
     try:
         exists_command = f"SELECT username FROM {USERS_TABLE} WHERE username=%(username)s;"
-        insert_command = f"INSERT INTO {USERS_TABLE} ('username', 'password') VALUES (%(username)s, %(password)s);"
+        insert_command = f"INSERT INTO {USERS_TABLE} (username, password) VALUES (%(username)s, %(password)s);"
         with create_cursor() as cursor:
             cursor.execute(exists_command, {'username': request.json['username']})
-            if cursor.fetchone is not None:
+            if cursor.fetchone() is not None:
                 return "username already exists"
             
-            cursor.execute(insert_command, {'password': request.json['password'], 'username': request.json['username']})
+            cursor.execute(insert_command, {'username': request.json['username'], 'password': request.json['password']})
             return "Succesfully registered"
     
     except ProgrammingError as e:
@@ -68,7 +81,7 @@ def delete_account():
     command = f"DELETE FROM {USERS_TABLE} where username='{session['name']}';"
     with create_cursor() as cursor:
         cursor.execute(command)
-        return redirect('login')
+        return redirect('.')
 
 
 @stage4_bp.route("/logout", methods=['GET'])
@@ -91,10 +104,15 @@ def search():
     
     command = f"SELECT name, description, price, amount_in_stock FROM {PRODUCTS_TABLE}"
     params = dict()
-    if 'search_string' in request.json.keys():
-        command += ' WHERE name LIKE %(search_string)s'
-        params['search_string'] = request.json['search_string']
-
+    if request.json['search_string'] != '':
+        command += f" WHERE name LIKE '%{request.json['search_string']}%'"
+        
     with create_cursor() as cursor:
         cursor.execute(command, params)
         return cursor.fetchall()
+
+@stage4_bp.route("/completion", methods=['GET'])
+def completion():
+    if not does_voldemort_exist():
+        return render_template("stage4/completion.html")
+    return redirect(".")

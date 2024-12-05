@@ -1,21 +1,34 @@
 <html><body>
+    <style>
+        table,
+        td,
+        th {
+            border: 1px solid;
+            padding: 20px;
+        }
 
+        table {
+            text-align: center;
+        }
+    </style>
 
 <div class="container">
 <h1 for="username"><b>Hello {{session['name']}}!</b></h1>
-<button type="logout" id="logout">Logout<br>
-<button id="delete account">Delete account<br><br><br>
+<button type="logout" id="logout">Logout</button><br>
+<button id="delete_account">Delete account</button><br><br><br>
 
 <input id="search_box"><br>
 <button id="search_button">search</button>
-<table id="products_table">
+<table id="products_table" width="100%" border="0" cellspacing="10">
+    <thead>
     <tr class="header">
       <th style="width:25%;">Name</th>
       <th style="width:25%;">Description</th>
       <th style="width:25%;">Price (Galleons)</th>
       <th style="width:25%;">Amount in stock</th>
     </tr>
-    <div id="products"></div>
+    </thead>
+    <tbody id="products_table_body"></tbody>
 </table>
 </div>
 
@@ -40,41 +53,41 @@
 
     function search()
     {
+        let data = {'search_string': document.getElementById("search_box").value};
         fetch("search", {
             method: 'POST',
-            body: JSON.stringify({'search_string': document.getElementById("search_box").value}),
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data),
         }).then(response => response.text())
         .then(text =>{
-            const products = document.getElementsByClassName("products")
-            
-            // Delete all products
-            while (products.lastElementChild){
-                products.removeChild(product.lastElementChild)
-            }
+            const products = document.getElementById("products_table_body");
+            products.innerHTML = "";
 
             // Add new products
             inserted_products = JSON.parse(text);
-            for (product in inserted_products){
-                product.appendChild(create_product_entry(product));
-            }
+            inserted_products.forEach((product) => {
+                products.insertAdjacentHTML("beforeend", create_product_tr(product));  
+            })
         })
     }
 
-    function create_product_entry(product)
+    function create_product_tr(product)
     {
-        const tr = document.createElement("tr");
-        for (property in product){
-            td = document.createElement("td");
-            td.text = property;
-            tr.appendChild(td);
-        }
+        tr = "<tr>";
+        product.forEach((property) => {
+            tr += "<td>" + property + "</td>";  
+        })
+        tr += "</tr>";
 
         return tr;
     }
 
     document.getElementById("logout").addEventListener("click", logout, false);
     document.getElementById("delete_account").addEventListener("click", delete_account, false);
-    document.getElementById("search").addEventListener("click", search, false);
+    document.getElementById("search_button").addEventListener("click", search, false);
 </script>
     
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
