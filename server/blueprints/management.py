@@ -12,8 +12,10 @@ def hello():
 
 @management_bp.route('/resetDB')
 def reset_database():
-    with create_cursor(database=None) as cursor:
-        sql_dump = get_file_contents(PROJECT_ROOT / "schema.sql")
-        cursor.execute(sql_dump)
-    
-    return "Reset done"
+    try:
+        with create_cursor(database=None) as cursor:
+            sql_dump = get_file_contents(PROJECT_ROOT / "schema.sql")
+            cursor.execute(sql_dump)
+            return "Reset done"
+    except Exception as e:
+        return e.msg

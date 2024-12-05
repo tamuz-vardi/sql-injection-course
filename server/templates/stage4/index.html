@@ -1,0 +1,81 @@
+<html><body>
+
+
+<div class="container">
+<h1 for="username"><b>Hello {{session['name']}}!</b></h1>
+<button type="logout" id="logout">Logout<br>
+<button id="delete account">Delete account<br><br><br>
+
+<input id="search_box"><br>
+<button id="search_button">search</button>
+<table id="products_table">
+    <tr class="header">
+      <th style="width:25%;">Name</th>
+      <th style="width:25%;">Description</th>
+      <th style="width:25%;">Price (Galleons)</th>
+      <th style="width:25%;">Amount in stock</th>
+    </tr>
+    <div id="products"></div>
+</table>
+</div>
+
+<script>
+    function logout()
+    {
+        fetch("logout", {
+            method: 'GET'
+        }).then(response => {
+            window.location.href = response.url;
+        })
+    }
+
+    function delete_account()
+    {
+        fetch("delete_account", {
+            method: 'GET'
+        }).then(response => {
+            window.location.href = response.url;
+        })
+    }
+
+    function search()
+    {
+        fetch("search", {
+            method: 'POST',
+            body: JSON.stringify({'search_string': document.getElementById("search_box").value}),
+        }).then(response => response.text())
+        .then(text =>{
+            const products = document.getElementsByClassName("products")
+            
+            // Delete all products
+            while (products.lastElementChild){
+                products.removeChild(product.lastElementChild)
+            }
+
+            // Add new products
+            inserted_products = JSON.parse(text);
+            for (product in inserted_products){
+                product.appendChild(create_product_entry(product));
+            }
+        })
+    }
+
+    function create_product_entry(product)
+    {
+        const tr = document.createElement("tr");
+        for (property in product){
+            td = document.createElement("td");
+            td.text = property;
+            tr.appendChild(td);
+        }
+
+        return tr;
+    }
+
+    document.getElementById("logout").addEventListener("click", logout, false);
+    document.getElementById("delete_account").addEventListener("click", delete_account, false);
+    document.getElementById("search").addEventListener("click", search, false);
+</script>
+    
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+</body></html>

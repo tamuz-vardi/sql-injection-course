@@ -11,6 +11,7 @@ from .blueprints.management import management_bp
 from .blueprints.stage1 import stage1_bp
 from .blueprints.stage2 import stage2_bp
 from .blueprints.stage3 import stage3_bp
+from .blueprints.stage4 import stage4_bp
 
 # Disable flask logging
 log = logging.getLogger('werkzeug')
@@ -26,6 +27,7 @@ app.register_blueprint(management_bp)
 app.register_blueprint(stage1_bp, url_prefix="/stage1")
 app.register_blueprint(stage2_bp, url_prefix="/stage2")
 app.register_blueprint(stage3_bp, url_prefix="/stage3")
+app.register_blueprint(stage4_bp, url_prefix="/stage4")
 
 
 def parse_args():
